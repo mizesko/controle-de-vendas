@@ -10,24 +10,39 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      devOptions: {
+        enabled: true
+      },
+      includeAssets: ['favicon.svg', 'logo.svg'],
       manifest: {
+        id: '/controle-saas',
         name: 'Controle SaaS',
         short_name: 'Controle',
         description: 'Gestão Financeira e Vendas',
         theme_color: '#09090b',
         background_color: '#09090b',
         display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'favicon.svg',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/svg+xml',
+            purpose: 'any'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'favicon.svg',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/svg+xml',
+            purpose: 'maskable'
+          },
+          {
+            src: 'favicon.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any'
           }
         ]
       }

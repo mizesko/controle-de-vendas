@@ -12,9 +12,11 @@ import {
   Wallet,
   BarChart3,
   Code2,
+  Smartphone,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/lib/utils'
+import { useEffect } from 'react'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -38,6 +40,33 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const initials = user?.user_metadata?.full_name
     ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : user?.email?.slice(0, 2).toUpperCase() || 'U'
+
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const isPwa = window.matchMedia('(display-mode: standalone)').matches
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const installApp = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt()
+      const { outcome } = await deferredPrompt.userChoice
+      if (outcome === 'accepted') setDeferredPrompt(null)
+    } else {
+      const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent) && !/Window/.test(navigator.userAgent)
+      if (isIos) {
+        alert('Para instalar no iPhone:\n1. Toque no botão de "Compartilhar" (quadrado com seta para cima)\n2. Role a lista e escolha "Adicionar à Tela de Início"')
+      } else {
+        alert('O app já está instalado ou seu navegador não suporta a instalação rápida. Tente usar o menu do navegador e escolher "Instalar Aplicativo".')
+      }
+    }
+  }
 
   return (
     <>
@@ -119,6 +148,30 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             </NavLink>
           ))}
         </nav>
+
+        {/* App Install - Only show if not in PWA standalone mode */}
+        {!isPwa && (
+          <div className="px-3 mb-2">
+            <button
+              onClick={installApp}
+              className={cn(
+                'flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all duration-300',
+                'bg-[var(--color-emerald)]/5 border border-[var(--color-emerald)]/20 text-[var(--color-emerald)]',
+                'hover:bg-[var(--color-emerald)]/10 hover:border-[var(--color-emerald)]/30 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)] group',
+              )}
+            >
+              <Smartphone size={20} className="shrink-0 group-hover:scale-110 transition-transform" />
+              <span
+                className={cn(
+                  'text-sm font-semibold whitespace-nowrap transition-opacity',
+                  collapsed ? 'opacity-0 w-0' : 'opacity-100'
+                )}
+              >
+                Baixar App
+              </span>
+            </button>
+          </div>
+        )}
 
         {/* User section */}
         <div className="p-3 border-t border-[var(--color-border)]">
