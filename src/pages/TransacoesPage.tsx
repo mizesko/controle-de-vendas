@@ -109,6 +109,7 @@ export default function TransacoesPage() {
   }
 
   async function toggleTransactionStatus(transaction: Transaction) {
+    if (!user) return
     const newStatus = !transaction.is_paid
 
     // 1. Update transaction

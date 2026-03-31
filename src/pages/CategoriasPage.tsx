@@ -32,7 +32,7 @@ export default function CategoriasPage() {
   }
 
   async function deleteCategory(id: string) {
-    if (!confirm('Tem certeza que deseja excluir esta categoria?')) return
+    if (!user || !confirm('Tem certeza que deseja excluir esta categoria?')) return
     
     // Check if there are transactions using this category
     const { count } = await supabase
